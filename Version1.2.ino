@@ -9,8 +9,11 @@
 DHT dht(DHTPIN, DHTTYPE); //instancia
 
 //sensor de tierra
-int sensorPinCC = A0; // Pin analógico al que está conectado el sensor
-int sensorPinCG = A2;
+int sensorPinCC = A0; // Pin analógico al que está conectado a la cama Kanche
+int sensorPinCG = A1; // Pin analógico al que está conectado a la cama del suelo
+int humidityCE = A2; // Pin analógico al que está conectado a la cama testigo 1
+int humidityCF = A3; // Pin analógico al que está conectado a la cama testigo 2
+
 int minValue = 1023;     // Valor mínimo del sensor
 int maxValue = 0;  // Valor máximo del sensor
 int minPorcentaje = 0;  // Porcentaje mínimo
@@ -24,6 +27,8 @@ int relayPinCG = 4;
 void setup() {
   pinMode(sensorPinCC, INPUT);
   pinMode(sensorPinCG, INPUT);
+  pinMode(humidityCE, INPUT);
+  pinMode(humidityCF, INPUT);
   dht.begin();
   Serial.begin(9600);
   //Fijamos la fecha y hora actuales
@@ -48,25 +53,40 @@ void loop() {
   // sensor
   float temperature = dht.readTemperature(); // Lee la temperatura en grados Celsius
   float humidity = dht.readHumidity(); // Lee la humedad relativa en porcentaje
-
-  Serial.print("Temperatura del aire: ");
-  Serial.print(temperature);
-  Serial.print(" °C, Humedad del aire: ");
-  Serial.print(humidity);
-  Serial.println(" %");
+  if (!isnan(temperature) && !isnan(humidity)) {
+    Serial.print("Temperatura del aire: ");
+    Serial.print(temperature);
+    Serial.print(" °C, Humedad del aire: ");
+    Serial.print(humidity);
+    Serial.println(" %");
+  }else{
+    Serial.println("Error al obtener informacion del sensor de aire");
+  }
 
   //sensores de tierra
-  int sensorValueCC = analogRead(sensorPinCC); // Lee el valor del sensor Cama chica
-  int sensorValueCG = analogRead(sensorPinCG); // Lee el valor del sensor Cama Grande
+//sensores de tierra
+  int sensorValueCC = analogRead(sensorPinCC); // Lee el valor del sensor Cama kanche
+  int sensorValueCG = analogRead(sensorPinCG); // Lee el valor del sensor Cama en el suelo
+  int sensorValueCE = analogRead(humidityCE); // Lee el valor del sensor Cama testigo 1
+  int sensorValueCF = analogRead(humidityCF); // Lee el valor del sensor Cama testigo 2
   //convertimos el valor del sensor en procentajes
   int porcentajeCC = map(sensorValueCC, minValue, maxValue, minPorcentaje, maxPorcentaje);
   int porcentajeCG = map(sensorValueCG, minValue, maxValue, minPorcentaje, maxPorcentaje);
-  //Imprimimos los valores del sensor
+  int porcentajeCE = map(sensorValueCE, minValue, maxValue, minPorcentaje, maxPorcentaje);
+  int porcentajeCF = map(sensorValueCF, minValue, maxValue, minPorcentaje, maxPorcentaje);
+  //Sensores con sistema
   Serial.print("Humedad del suelo de la cama chica: ");
   Serial.print(porcentajeCC);
   Serial.println("%");
   Serial.print("Humedad del suelo de la cama grande: ");
   Serial.print(porcentajeCG);
+  Serial.println("%");
+  // sensores sin sistema
+  Serial.print("Humedad del suelo de la cama testigo 1: ");
+  Serial.print(porcentajeCE);
+  Serial.println("%");
+  Serial.print("Humedad del suelo de la cama testigo 2: ");
+  Serial.print(porcentajeCF);
   Serial.println("%");
   //Variables para las condiciones
   int hora = hour();
