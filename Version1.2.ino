@@ -111,24 +111,33 @@ void loop() {
 
   //inicio de condiciones
   if ((hora >= 18 && hora <=24) ||(hora >= 1 && hora <=8) ){
-    //Cama chica
+    //Cama kanche
     if (porcentajeCC <=10 ){
-      digitalWrite(relayPinCC, HIGH); //encendemos el relay y por ende la electrioValvula
-      Serial.println("El riego esta activo 1");
-      //delay(30000);
-      delay(60000); //se enciende durante un minuto.
-      digitalWrite(relayPinCC, LOW);
+      digitalWrite(relayPinCC, HIGH); //encendemos la electrovalvula 1
+      //Validacion de la activacion del relevador
+      if (digitalRead(relayPinCC) == HIGH) {
+        Serial.println("El riego de la cama Kanche esta activo");
+        delay(1000); // 1 segundo
+        digitalWrite(relayPinCG, LOW);
+      } else {
+        Serial.println("Error al encender el riego de la cama kanche");
+        digitalWrite(relayPinCG, LOW); //por si las dudas un low ki
+      }
     }else{
-      Serial.println("La siembra sigue con humedad mayor al 20%");
-      delay(59000);
+      Serial.println("La siembra sigue con humedad mayor al 10%");
     }
     //Cama grande
     if (porcentajeCG <=20 ){
-      digitalWrite(relayPinCG, HIGH); //encendemos el relay y por ende la electrioValvula
-      Serial.println("El riego esta activo 2");
-      delay(300000); //se enciende durante un cinco minutos.
-      digitalWrite(relayPinCG, LOW);
-      delay(40000);
+      digitalWrite(relayPinCG, HIGH); //encendemos la electrovalvula 1
+      //Validacion de la activacion del relevador
+      if (digitalRead(relayPinCG) == HIGH) {
+        Serial.println("El riego de la cama en la tierra esta activo");
+        delay(1000); // 1 segundo
+        digitalWrite(relayPinCG, LOW);
+      } else {
+        Serial.println("Error al encender el riego de la cama en el suelo");
+        digitalWrite(relayPinCG, LOW); //por si las dudas un low ki
+      }
     }else{
       Serial.println("La siembra sigue con humedad mayor al 20%");
       delay(59000);
