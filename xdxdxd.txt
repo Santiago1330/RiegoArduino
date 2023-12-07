@@ -1,0 +1,35 @@
+//el sistema debe estar activo de 6 pm a 8 am
+  if ((hora >= 18 && hora <=24) ||(hora >= 1 && hora <=8) ){
+    //Cama chica
+    if (porcentajeCC <=10 ){
+      digitalWrite(relayPinCC, HIGH); //encendemos el relay y por ende la electrioValvula
+      Serial.println("El riego esta activo 1");
+      //delay(30000);
+      delay(60000); //se enciende durante un minuto.
+      digitalWrite(relayPinCC, LOW);
+    }else{
+      Serial.println("La siembra sigue con humedad mayor al 20%");
+      delay(59000);
+    }
+    //Cama grande
+    if (porcentajeCG <=20 ){
+      digitalWrite(relayPinCG, HIGH); //encendemos el relay y por ende la electrioValvula
+      Serial.println("El riego esta activo 2");
+      //delay(30000);
+      delay(300000); //se enciende durante un cinco minutos.
+      digitalWrite(relayPinCG, LOW);
+      delay(40000);
+    }else{
+      Serial.println("La siembra sigue con humedad mayor al 20%");
+      delay(59000);
+    }
+  }else{
+    Serial.println("NO es momento de regar");
+    Serial.print("Humedad del suelo cama chica: ");
+    Serial.print(porcentajeCC);
+    Serial.println("%");
+    Serial.print("Humedad del suelo cama grande: ");
+    Serial.print(porcentajeCG);
+    Serial.println("%");
+    delay(59000); //se espera un minuto
+  }

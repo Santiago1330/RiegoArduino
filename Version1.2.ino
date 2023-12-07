@@ -32,7 +32,7 @@ void setup() {
   dht.begin();
   Serial.begin(9600);
   //Fijamos la fecha y hora actuales
-  setTime(15, 17, 0, 5, 07, 2023);// Hora,Min,Seg - Dia,Mes,Año
+  setTime(17, 15, 0, 30, 11, 2023);// Hora,Min,Seg - Dia,Mes,Año
   pinMode(relayPinCC, OUTPUT);
   pinMode(relayPinCG, OUTPUT);
 }
@@ -63,36 +63,53 @@ void loop() {
     Serial.println("Error al obtener informacion del sensor de aire");
   }
 
-  //sensores de tierra
-//sensores de tierra
+//lectura de los sensores de tierra
   int sensorValueCC = analogRead(sensorPinCC); // Lee el valor del sensor Cama kanche
   int sensorValueCG = analogRead(sensorPinCG); // Lee el valor del sensor Cama en el suelo
   int sensorValueCE = analogRead(humidityCE); // Lee el valor del sensor Cama testigo 1
   int sensorValueCF = analogRead(humidityCF); // Lee el valor del sensor Cama testigo 2
-  //convertimos el valor del sensor en procentajes
-  int porcentajeCC = map(sensorValueCC, minValue, maxValue, minPorcentaje, maxPorcentaje);
-  int porcentajeCG = map(sensorValueCG, minValue, maxValue, minPorcentaje, maxPorcentaje);
-  int porcentajeCE = map(sensorValueCE, minValue, maxValue, minPorcentaje, maxPorcentaje);
-  int porcentajeCF = map(sensorValueCF, minValue, maxValue, minPorcentaje, maxPorcentaje);
-  //Sensores con sistema
-  Serial.print("Humedad del suelo de la cama chica: ");
-  Serial.print(porcentajeCC);
-  Serial.println("%");
-  Serial.print("Humedad del suelo de la cama grande: ");
-  Serial.print(porcentajeCG);
-  Serial.println("%");
-  // sensores sin sistema
-  Serial.print("Humedad del suelo de la cama testigo 1: ");
-  Serial.print(porcentajeCE);
-  Serial.println("%");
-  Serial.print("Humedad del suelo de la cama testigo 2: ");
-  Serial.print(porcentajeCF);
-  Serial.println("%");
+
+  //Validacion de la lectura de la cama kanche
+  if (sensorValueCC >= minValue && sensorValueCC <= maxValue) {
+    int porcentajeCC = map(sensorValueCC, minValue, maxValue, minPorcentaje, maxPorcentaje);
+    Serial.print("Humedad del suelo de la cama Kanche: ");
+    Serial.print(porcentajeCC);
+    Serial.println("%");
+  } else {
+    Serial.println("Error al leer el sensor de tierra Cama kanche");
+  }
+  //Validacion de la lectura de la cama en el suelo
+  if (sensorValueCG >= minValue && sensorValueCG <= maxValue) {
+    int porcentajeCG = map(sensorValueCG, minValue, maxValue, minPorcentaje, maxPorcentaje);
+    Serial.print("Humedad de la tierra de la cama en el suelo: ");
+    Serial.print(porcentajeCG);
+    Serial.println("%");
+  } else {
+    Serial.println("Error al leer el sensor de tierra de la cama en en suelo");
+  }
+  //Validacion de la lectura de la cama testigo 1
+  if (sensorValueCE >= minValue && sensorValueCE <= maxValue) {
+    int porcentajeCE = map(sensorValueCE, minValue, maxValue, minPorcentaje, maxPorcentaje);
+    Serial.print("Humedad de la tierra de la cama TESTIGO 1: ");
+    Serial.print(porcentajeCE);
+    Serial.println("%");
+  } else {
+    Serial.println("Error al leer el sensor de tierra de la cama TESTIGO 1");
+  }
+  //Validacion de la lectura de la cama testigo 2
+  if (sensorValueCF >= minValue && sensorValueCF <= maxValue) {
+    int porcentajeCF = map(sensorValueCF, minValue, maxValue, minPorcentaje, maxPorcentaje);
+    Serial.print("Humedad de la tierra de la cama TESTIGO 2: ");
+    Serial.print(porcentajeCF);
+    Serial.println("%");
+  } else {
+    Serial.println("Error al leer el sensor de tierra de la cama TESTIGO 2");
+  }
+
   //Variables para las condiciones
   int hora = hour();
 
   //inicio de condiciones
-  //el sistema debe estar activo de 6 pm a 8 am
   if ((hora >= 18 && hora <=24) ||(hora >= 1 && hora <=8) ){
     //Cama chica
     if (porcentajeCC <=10 ){
@@ -109,7 +126,6 @@ void loop() {
     if (porcentajeCG <=20 ){
       digitalWrite(relayPinCG, HIGH); //encendemos el relay y por ende la electrioValvula
       Serial.println("El riego esta activo 2");
-      //delay(30000);
       delay(300000); //se enciende durante un cinco minutos.
       digitalWrite(relayPinCG, LOW);
       delay(40000);
